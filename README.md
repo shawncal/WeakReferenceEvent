@@ -1,1 +1,11 @@
 # WeakReference `event` in C#
+This project demonstrates how to use custom `WeakReferenceEventHandler` and `WeakReferenceAsyncEventHandler` (awaitable) classes that allow you to register event handlers backed by a `WeakReference`, which means that the handlers do not need to be explicitly unregistered or disposed when they go out of scope or are garbage collected.
+
+## Motivation
+In C#, events are based on multicast delegates, which are essentially lists of method references that can be invoked together. When you register an event handler using the `+=` operator, you are adding a reference to your handler method to the delegate list. This creates a strong reference between the event source and the handler, which means that the handler will not be garbage collected as long as the event source is alive, unless you explicitly unregister it using the `-=` operator or dispose it if it implements `IDisposable`.
+
+This can lead to memory leaks or unwanted side effects if you forget to unregister or dispose your handlers, or if you register handlers from objects that have a shorter lifetime than the event source. For example, if you register a handler from a UI control that is dynamically created and destroyed, the handler will keep the control alive even after it is removed from the UI, unless you unregister it in the control's `Dispose` method.
+
+A possible solution to this problem is to use a `WeakReference` to store the handler method reference, instead of a strong reference. A `WeakReference` is a special type of reference that does not prevent the target object from being garbage collected. It has a `Target` property that returns the referenced object if it is still alive, or `null` if it has been collected. By using a `WeakReference`, you can avoid creating a strong reference between the event source and the handler, and let the garbage collector reclaim the handler object when it is no longer needed.
+
+However, the built-in `event` keyword in C# does not support using `WeakReference` for handlers, so we need to implement our own custom `EventHandler` that can manage and abstract the `WeakReference` logic, making it transparent to callers. This project provides example of such classes, `WeakReferenceEventHander` and `WeakReferenceAsyncEventHandler`, and shows how to use them in various scenarios.
