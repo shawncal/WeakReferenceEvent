@@ -1,1 +1,1 @@
-# Weak Reference Events in C#
+# WeakReference `event` in C#
